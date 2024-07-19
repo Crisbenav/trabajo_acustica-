@@ -1,0 +1,100 @@
+import flet as ft  # Alias ft
+
+def main(page: ft.Page):
+    page.title = "Rigidez Dinámica de Materiales Acústicos"
+
+    # Lista de materiales con sus propiedades (DICCIONARIO)
+    materiales = {
+        "EPE": {"frecuencia_resonancia": 101.1},
+        "XLPE1": {"frecuencia_resonancia": 131.5},
+        "XLPE2": {"frecuencia_resonancia": 206.6},
+        "XLPE3": {"frecuencia_resonancia": 171.2},
+        "IXPE": {"frecuencia_resonancia": 201.5},
+        "XLPP": {"frecuencia_resonancia": 331.1},
+        "EVA": {"frecuencia_resonancia": 389.0},
+        "RBCK": {"frecuencia_resonancia": 142.5},
+        "RTXT": {"frecuencia_resonancia": 99.8},
+        "WOOL": {"frecuencia_resonancia": 89.6},
+        "WFBR": {"frecuencia_resonancia": 149.9},
+        "RRUB": {"frecuencia_resonancia": 111.6},
+        "CORK": {"frecuencia_resonancia": 252.3}
+    }
+
+    # Función para manejar la selección del desplegable
+    def seleccion_cambiada(event):
+        material_seleccionado = event.control.value
+        propiedades = materiales.get(material_seleccionado)
+        frecuencia_resonancia = propiedades.get('frecuencia_resonancia')
+        propiedades_text.value = f"Material: {material_seleccionado}\nFrecuencia de Resonancia: {frecuencia_resonancia} Hz"
+        page.update()  # Actualizar página
+
+    # Función para calcular la rigidez dinámica
+    def calcular_rigidez(event):
+        ancho = float(ancho_input.value)
+        largo = float(largo_input.value)
+        masa = float(masa_input.value)
+        area = ancho * largo
+        frecuencia = materiales.get(dropdown.value).get('frecuencia_resonancia')
+        rigidez_dinamica = 4 * (3.1416 ** 2) * masa / area * (frecuencia ** 2)
+        resultado_text.value = f"Rigidez Dinámica: {rigidez_dinamica:.2f} N/m²"
+        page.update()  # Actualizar página
+
+    # Crear el botón desplegable (DropDown)
+    dropdown = ft.Dropdown(
+        options=[ft.dropdown.Option(material) for material in materiales.keys()],
+        on_change=seleccion_cambiada
+    )
+
+    # Texto para mostrar las propiedades del material
+    propiedades_text = ft.Text(value="Seleccione un material", size=14)
+
+    # Campos de entrada para ancho, largo y masa
+    ancho_input = ft.TextField(label="Ancho (m)")
+    largo_input = ft.TextField(label="Largo (m)")
+    masa_input = ft.TextField(label="Masa (kg)")
+
+    # Botón para calcular la rigidez dinámica
+    calcular_btn = ft.ElevatedButton(text="Calcular Rigidez Dinámica", on_click=calcular_rigidez)
+
+    # Texto para mostrar el resultado del cálculo
+    resultado_text = ft.Text(value="")
+
+    # Texto para mostrar la ecuación y la descripción de sus componentes
+    ecuacion_text = ft.Text(value="""
+    Rigidez Dinámica = 4 * π² * masa / área * frecuencia²
+    Donde:
+    - masa: masa del material (kg)
+    - área: área del material (m²)
+    - frecuencia: frecuencia de resonancia del material (Hz)
+    """, size=14)
+
+    # Crear un contenedor para el logo, nombre y correo
+    logo = ft.Image(src="acustica_color.PNG", width=100, height=100)  # Reemplaza "logo.png" con la ruta de tu logo
+    nombre_text = ft.Text(value="Cristian Benavides", size=10.5)
+    correo_text = ft.Text(value="cristian.benavides@alumnos.uach.cl", size=10.5)
+
+    logo_container = ft.Container(
+        content=ft.Column([
+            logo,
+            nombre_text,
+            correo_text
+        ], horizontal_alignment="center"),
+        alignment=ft.alignment.bottom_right,
+        margin=ft.margin.all(10)
+    )
+
+    # Añadir los elementos a la página
+    page.add(
+        dropdown,
+        propiedades_text,
+        ancho_input,
+        largo_input,
+        masa_input,
+        calcular_btn,
+        resultado_text,
+        ecuacion_text,
+        logo_container  
+    )
+
+# Ejecutar la aplicación
+ft.app(target=main)
